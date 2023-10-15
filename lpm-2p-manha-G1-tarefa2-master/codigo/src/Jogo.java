@@ -57,6 +57,73 @@ public class Jogo {
         this.jogosPorEquipe = new HashMap<>();
 
     }
+    
+   
+    public String getDataDoJogo() {
+        return dataDoJogo;
+    }
+
+    public void setDataDoJogo(String dataDoJogo) {
+        this.dataDoJogo = dataDoJogo;
+    }
+
+    public int getEquipeA() {
+        return equipeA;
+    }
+
+    public void setEquipeA(int equipeA) {
+        this.equipeA = equipeA;
+    }
+
+    public int getEquipeB() {
+        return equipeB;
+    }
+
+    public void setEquipeB(int equipeB) {
+        this.equipeB = equipeB;
+    }
+
+    public int[][] getPlacar() {
+        return placar;
+    }
+
+    public void setPlacar(int[][] placar) {
+        this.placar = placar;
+    }
+
+    
+    public int getIdEquipe() {
+        return idEquipe;
+    }
+
+    public void setIdEquipe(int idEquipe) {
+        this.idEquipe = idEquipe;
+    }
+
+    public int getIdJogos() {
+        return idJogos;
+    }
+
+    public void setIdJogos(int idJogos) {
+        this.idJogos = idJogos;
+    }
+
+    public String getNomeEquipeA() {
+        return nomeEquipeA;
+    }
+
+    public void setNomeEquipeA(String nomeEquipeA) {
+        this.nomeEquipeA = nomeEquipeA;
+    }
+
+    public String getNomeEquipeB() {
+        return nomeEquipeB;
+    }
+
+    public void setNomeEquipeB(String nomeEquipeB) {
+        this.nomeEquipeB = nomeEquipeB;
+    }
+
 
     /**
      * Lê as equipes do arquivo CSV e exibe o nome de cada equipe com um
@@ -96,65 +163,75 @@ public class Jogo {
      */
     public void cadastrarJogo() {
         scanner = new Scanner(System.in);
-
+    
         System.out.print("Digite a data do jogo (dd/MM/yyyy): ");
         dataDoJogo = scanner.nextLine();
         SimpleDateFormat dataFormat = new SimpleDateFormat("dd/MM/yyyy");
         try {
             java.util.Date parsedDate = dataFormat.parse(dataDoJogo);
             this.data = new Date(parsedDate.getTime());
-
+    
             Date dataAtual = new Date();
             if (data.before(dataAtual)) {
                 System.out.println("A data do jogo deve ser no futuro.");
                 return;
             }
-
         } catch (ParseException e) {
             System.out.println("Formato de data inválido. Use dd/MM/yyyy.");
             return;
         }
-
+    
+        int equipeA;
+        int equipeB;
+    
         System.out.print("Digite o número da equipe A: ");
-        equipeA = scanner.nextInt();
-
+        if (scanner.hasNextInt()) {
+            equipeA = scanner.nextInt();
+        } else {
+            System.out.println("Número da equipe A inválido. Use apenas números inteiros.");
+            return;
+        }
+    
+        // Verificar se a entrada para a equipe B é um número
         System.out.print("Digite o número da equipe B: ");
-        equipeB = scanner.nextInt();
-
-        Jogo novoJogo = new Jogo(dataDoJogo, equipeA, equipeB);
-
-        if (jogosCadastrado.contains(novoJogo)) {
+        if (scanner.hasNextInt()) {
+            equipeB = scanner.nextInt();
+        } else {
+            System.out.println("Número da equipe B inválido. Use apenas números inteiros.");
+            return;
+        }
+    
+        if (jogosCadastrado.contains(this)) {
             System.out.println("Esse jogo já foi cadastrado.");
             return;
         }
-        
-
+    
         if (equipeA == equipeB) {
             System.out.println("Uma equipe não pode jogar consigo mesma.");
             return;
         }
-
+    
         if (jogoJaCadastrado(equipeA, equipeB)) {
             System.out.println("Esse jogo já foi cadastrado.");
             return;
         }
-
+    
         nomeEquipeA = obterNomeEquipe(equipeA);
         nomeEquipeB = obterNomeEquipe(equipeB);
-
+    
         if (nomeEquipeA != null && nomeEquipeB != null) {
             if (!equipesPodemJogar(equipeA) || !equipesPodemJogar(equipeB)) {
                 System.out.println("Uma das equipes já jogou 7 vezes.");
                 return;
             }
-
+    
             System.out.println("Jogo cadastrado: " + dataDoJogo + ", " + nomeEquipeA + " , " + nomeEquipeB);
-
+    
             try {
                 escreverNovoJogo(dataDoJogo, equipeA, equipeB);
                 atualizarContagemJogos(equipeA);
                 atualizarContagemJogos(equipeB);
-                jogosCadastrado.add(novoJogo);
+                jogosCadastrado.add(this);
             } catch (IOException e) {
                 System.err.println("Erro ao escrever no arquivo: " + e.getMessage());
             }
@@ -162,7 +239,7 @@ public class Jogo {
             System.out.println("ID da equipe não encontrado.");
         }
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
